@@ -76,10 +76,9 @@ export default () => {
   };
   const evaluateChoice = (answer) => {
     if (Quiz.correct.trim().toLowerCase() === answer.trim().toLowerCase()) {
-   
-      if ((Quiz.id + 1) <= Quiz.count) {
+      if (Quiz.id + 1 <= Quiz.count) {
         nextQuestion(Quiz.category, Quiz.id + 1);
-      }else{
+      } else {
         setQuizDone(!quizDone);
       }
     } else {
@@ -104,39 +103,50 @@ export default () => {
       );
     });
   };
-  const loadImage =  (url) => {
-    // console.log(window.location.origin + url)
-    if (url == "not available"){
-      return
-          } else if(Array.isArray(url)){
+  const loadImage = (url) => {
+   
+    /**
+     * use: window.location.origin + url
+     * instead of "./src" + url
+     * in production code.
+     */
+    if (url == "not available") {
+      return;
+    } else if (Array.isArray(url)) {
       return url.map((url, id) => {
-        return <section className="image" key={id}>
-        <img src={window.location.origin + url} alt="Quiz test image" />
-      </section>
-      })
-    
-    }else{
-    
+        return (
+          <section className="image" key={id}>
+            <img src={"./src" + url} alt="Quiz test image" />
+          </section>
+        );
+      });
+    } else {
       return (
         <section className="image">
-          <img src={window.location.origin + url} alt="Quiz test image" />
+          <img src={"./src" + url} alt="Quiz test image" />
         </section>
       );
     }
-
   };
   const errorAlertOnClick = (e) => {
     setWrongAnswer(!wrongAnswer);
   };
-  const goodAlertOnClick= e => {
+  const goodAlertOnClick = (e) => {
     setQuizDone(!quizDone);
-  }
+  };
   return (
     <article className="component">
-     
-      {quizDone && <GoodAlert message={"🎉 Congratulation You've Finished 🎉"} handleClick={goodAlertOnClick}/>}
+      {quizDone && (
+        <GoodAlert
+          message={"🎉 Congratulation You've Finished 🎉"}
+          handleClick={goodAlertOnClick}
+        />
+      )}
       {wrongAnswer && (
-        <ErrorAlert message={"Incorrect Answer !"} handleClick={errorAlertOnClick} />
+        <ErrorAlert
+          message={"Incorrect Answer !"}
+          handleClick={errorAlertOnClick}
+        />
       )}
       <select
         onChange={handleChange}
@@ -153,25 +163,26 @@ export default () => {
           )}
         </optgroup>
       </select>
-    
-        <form id="quiz-question"  onSubmit={handleSubmit}>
-          <h3 className="question">{Quiz?.question || dataNotAvailable}</h3>
-          <h4>Select Correct Answer below :</h4>
 
-          {loadImage(Quiz?.imgSrc)}
+      <form id="quiz-question" onSubmit={handleSubmit}>
+        <h3 className="question">{Quiz?.question || dataNotAvailable}</h3>
+        <h4>Select Correct Answer below :</h4>
 
-         <section id="choices">
-         {loadMultipleChoice(Quiz?.answers || [dataNotAvailable])}
-         </section>
-          <button type="submit" id="submit-form">Submit</button>
-        </form>
+        {loadImage(Quiz?.imgSrc)}
 
-        <div id="count">
-          <span>
-            {Quiz?.id || dataNotAvailable} of {Quiz?.count || dataNotAvailable}
-          </span>
-        </div>
-   
+        <section id="choices">
+          {loadMultipleChoice(Quiz?.answers || [dataNotAvailable])}
+        </section>
+        <button type="submit" id="submit-form">
+          Submit
+        </button>
+      </form>
+
+      <div id="count">
+        <span>
+          {Quiz?.id || dataNotAvailable} of {Quiz?.count || dataNotAvailable}
+        </span>
+      </div>
     </article>
   );
 };
