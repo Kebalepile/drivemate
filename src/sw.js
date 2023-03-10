@@ -18,8 +18,9 @@ self.addEventListener("install", (e) => {
         .then((values) => {
           let cacheItems = ["/"];
           cacheItems = cacheItems.concat(...values);
-
-          caches.open(cacheName).then((cache) => cache.addAll(cacheItems));
+          let uniqueRequests = [...new Set(cacheItems)];
+ 
+          caches.open(cacheName).then((cache) => cache.addAll(uniqueRequests));
         })
         .catch((err) => console.error(err));
     })()

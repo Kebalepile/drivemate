@@ -3,23 +3,43 @@ import { Link } from "react-router-dom";
 import { RiHomeSmileLine } from "react-icons/ri";
 import { MdOutlineQuiz } from "react-icons/md";
 
+function installBanner() {
+  const key = "installBanner";
+  if (window.matchMedia("(display-mode: standalone)").matches) {
+    localStorage.setItem(key, JSON.stringify(false));
+  } else {
+    localStorage.setItem(key, JSON.stringify(true));
+  }
+  let bannerState = JSON.parse(localStorage.getItem(key));
+  return {
+    currentState() {
+      return bannerState;
+    },
+    changeState() {
+      localStorage.setItem(key, JSON.stringify(!bannerState));
+      bannerState = JSON.parse(localStorage.getItem(key));
+    },
+  };
+}
+
+const bannerInfo = installBanner();
 
 export default () => {
   const [toggle, setToggle] = useState({
-    banner: true,
+    banner: bannerInfo.currentState(),
     quizPage: true,
     aboutPage: true,
   });
-const [deferredPrompt, setPrompt] = useState(null)
+  const [deferredPrompt, setPrompt] = useState(null);
   useEffect(() => {
-    window.addEventListener("beforeinstallprompt", event => {
+    window.addEventListener("beforeinstallprompt", (event) => {
       event.preventDefault();
       setPrompt(event);
-    })
-    if (window.matchMedia("(dsplay-mode: standalone)").matches) {
+    });
+    window.addEventListener("appinstalled", (event) => {
       setToggle({ ...toggle, banner: false });
-    }
-  });
+    });
+  }, [toggle]);
   /**
    *
    * @param {object} e
@@ -36,7 +56,7 @@ const [deferredPrompt, setPrompt] = useState(null)
     switch (pathname) {
       case "/":
         setToggle({
-          banner: true,
+          ...toggle,
           homePage: false,
           quizPage: true,
           aboutPage: true,
@@ -44,7 +64,7 @@ const [deferredPrompt, setPrompt] = useState(null)
         break;
       case "/quiz":
         setToggle({
-          banner: false,
+          ...toggle,
           quizPage: false,
           homePage: true,
           aboutPage: true,
@@ -52,9 +72,9 @@ const [deferredPrompt, setPrompt] = useState(null)
         break;
       case "/about":
         setToggle({
-          banner: false,
+          ...toggle,
           quizPage: true,
-            homePage: true,
+          homePage: true,
           aboutPage: false,
         });
         break;
@@ -63,10 +83,9 @@ const [deferredPrompt, setPrompt] = useState(null)
     }
   };
   const handleInstall = (e) => {
-if(deferredPrompt){
-  deferredPrompt.prompt();
-}
-    setToggle({ ...toggle, banner: false });
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+    }
   };
   return (
     <Fragment>
